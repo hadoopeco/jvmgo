@@ -14,12 +14,12 @@ CONSTANT_String_info {
     u2 string_index;
 }
 */
- type ConstantStringInfo struct {
- 	cp ConstantPool
- 	stringIndex uint16
- }
+type ConstantStringInfo struct {
+	cp          ConstantPool
+	stringIndex uint16
+}
 
-func (self *ConstantStringInfo) readInfo(reader *ClassReader)  {
+func (self *ConstantStringInfo) readInfo(reader *ClassReader) {
 	self.stringIndex = reader.readUint16()
 }
 

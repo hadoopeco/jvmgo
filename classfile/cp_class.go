@@ -9,15 +9,15 @@ package classfile
  * Date: 2018/3/24 0:32
  */
 
- type ConstantClassInfo struct {
- 	cp ConstantPool
- 	nameIndex uint16
- }
+type ConstantClassInfo struct {
+	cp        ConstantPool
+	nameIndex uint16
+}
 
- func (self *ConstantClassInfo) readInfo (reader *ClassReader){
- 	self.nameIndex = reader.readUint16()
- }
+func (self *ConstantClassInfo) readInfo(reader *ClassReader) {
+	self.nameIndex = reader.readUint16()
+}
 
-func (self *ConstantClassInfo) String(reader *ClassReader) string {
+func (self *ConstantClassInfo) Name() string {
 	return self.cp.getUtf8(self.nameIndex)
 }

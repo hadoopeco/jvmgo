@@ -1,5 +1,7 @@
 package heap
 
+import "jvmgo/classfile"
+
 /**
  * Copyright (C) 2018
  * All rights reserved
@@ -8,10 +10,16 @@ package heap
  * @mail: marks@126.com
  * Date: 2018/3/25 10:34
  */
-
+// 字段和方法都属于类成员 有一些相同的信息（访问标志，名称，描述符）
 type ClassMember struct {
-	accessFlags			uint16
-	name				string
-	descriptor			string
-	class				*Class
+	accessFlags uint16
+	name        string
+	descriptor  string
+	class       *Class //存放Class结构体指针
+}
+
+func (self *ClassMember) copyMemberInfo(memberInfo *classfile.MemberInfo) {
+	self.accessFlags = memberInfo.AccessFlags()
+	self.name = memberInfo.Name()
+	self.descriptor = memberInfo.Descriptor()
 }
