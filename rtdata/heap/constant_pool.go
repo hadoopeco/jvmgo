@@ -18,6 +18,13 @@ import (
 	运行时常量主要放两类信息 字面量(literal) 和 符号引用(symbolic reference)
 	字面量包括整数,浮点数和字符串字面量;
 	符号引用包括类符号引用,字段符号引用,方法符号引用和接口方法符号引用
+	ConstantPool ---1-------1---- Class          ClassMember
+									|1               |
+									|          ______|______
+									|		   |           |
+									|-----*- Field      Method
+									|					  |*
+									|_____________________|
 */
 type Constant interface{}
 

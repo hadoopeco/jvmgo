@@ -15,14 +15,14 @@ ConstantValue_attribute {
     u2 constantvalue_index;
 }
 */
- type ConstantValueAttribute struct {
- 	constantValueIndex uint16
- }
+type ConstantValueAttribute struct {
+	constantValueIndex uint16
+}
 
- func (self *ConstantValueAttribute) readInfo(reader *ClassReader){
+func (self *ConstantValueAttribute) readInfo(reader *ClassReader) {
 	self.constantValueIndex = reader.readUint16()
- }
+}
 
- func (self *ConstantValueAttribute) ConstantValueIndex(reader *ClassReader) uint16{
- 	return self.constantValueIndex
- }
+func (self *ConstantValueAttribute) ConstantValueIndex() uint16 {
+	return self.constantValueIndex
+}

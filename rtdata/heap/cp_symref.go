@@ -14,6 +14,15 @@ package heap
  对于类符号引用, 只要有类名,就可以解析符号引用
  对于字段,首先要解析类符号引用得到数据,然后用字段名和描述符查找字段数据
  方法符号的解析过程和字段符号的解析过程类似
+
+						SymRef
+						  |
+					______|________
+                   |               |
+                ClassRef        MemberRef
+                    _______________|______________
+                   |               |              |
+           InterfaceMethodRef   MethodRef      FieldRef
 */
 type SymRef struct {
 	cp        *ConstantPool
