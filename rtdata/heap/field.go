@@ -1,6 +1,9 @@
 package heap
 
-import "jvmgo/classfile"
+import (
+	"fmt"
+	"jvmgo/classfile"
+)
 
 /**
  * Copyright (C) 2018
@@ -21,6 +24,7 @@ func newFields(class *Class, cfFields []*classfile.MemberInfo) []*Field {
 	fields := make([]*Field, len(cfFields))
 	for i, cfField := range cfFields {
 		fields[i] = &Field{}
+		fmt.Printf("newField = %v \n", class)
 		fields[i].class = class
 		fields[i].copyMemberInfo(cfField)
 		fields[i].copyAttributes(cfField)
@@ -55,8 +59,4 @@ func (self *Field) SlotId() uint {
 }
 func (self *Field) isLongOrDouble() bool {
 	return self.descriptor == "J" || self.descriptor == "D"
-}
-
-func (self *Field) Descriptor() string {
-	return self.descriptor
 }

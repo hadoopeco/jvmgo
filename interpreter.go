@@ -1,11 +1,11 @@
 package main
 
 import (
-	"jvmgo/classfile"
-	"jvmgo/rtdata"
-	"jvmgo/instructions/base"
-	"jvmgo/instructions"
 	"fmt"
+	"jvmgo/instructions"
+	"jvmgo/instructions/base"
+	"jvmgo/rtdata"
+	"jvmgo/rtdata/heap"
 )
 
 /**
@@ -17,27 +17,20 @@ import (
  * Date: 2018/3/28 2:31
  */
 
-func interpret(methodInfo *classfile.MemberInfo)  {
-	codeAttr := methodInfo.CodeAttribute() //获取code属性
-	maxLoacls := codeAttr.MaxLocals()
-	maxStack := codeAttr.MaxStack() //获取操作数空间
-	bytecode := codeAttr.Code()  //获取字节码
-	for c := range bytecode{
-		fmt.Printf("0x%x ",bytecode[c])
-	}
-	fmt.Println(" ")
+func interpret(method *heap.Method) {
+
 	thread := rtdata.NewThread()
-	frame := thread.NewFrame(maxLoacls,  maxStack)
+	frame := thread.NewFrame(method)
+	fmt.Printf("interpret :%v \n", method.Code())
 	thread.PushFrame(frame)
 
 	defer catchErr(frame)
-	loop(thread, bytecode)
+	loop(thread, method.Code())
 }
-
 
 func catchErr(frame *rtdata.Frame) {
 	if r := recover(); r != nil {
-		fmt.Printf("LocalVars: %v \n", frame.LocalVars() )
+		fmt.Printf("LocalVars: %v \n", frame.LocalVars())
 		fmt.Printf("OperandsStack:%v\n", frame.OperandStack())
 		panic(r)
 	}
@@ -47,7 +40,6 @@ func catchErr(frame *rtdata.Frame) {
 func loop(thread *rtdata.Thread, bytecode []byte) {
 	frame := thread.PopFrame()
 	reader := &base.BytecodeReader{}
-
 	for {
 		pc := frame.NextPC()
 		thread.SetPC(pc)
@@ -60,10 +52,7 @@ func loop(thread *rtdata.Thread, bytecode []byte) {
 		frame.SetNextPC(reader.PC())
 
 		// execute
-		fmt.Printf("pc:%2d nextpc:%2d opcode:0x%x inst:%T %v\n", pc, reader.PC(), opcode, inst, inst )
+		fmt.Printf("pc:%2d opcode:0x%2d inst:%T %v\n", pc, opcode, inst, inst)
 		inst.Execute(frame)
 	}
 }
-
-
-

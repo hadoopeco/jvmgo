@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"jvmgo/classfile"
 	"jvmgo/classpath"
+	"strings"
 )
 
 type ClassLoader struct {
@@ -33,7 +34,7 @@ func NewClassLoader(cp *classpath.Classpath) *ClassLoader {
 	}
 }
 
-func (self *ClassLoader) loadClass(name string) *Class {
+func (self *ClassLoader) LoadClass(name string) *Class {
 	if class, ok := self.classMap[name]; ok {
 		return class
 	}
@@ -45,6 +46,7 @@ func (self *ClassLoader) loadClass(name string) *Class {
  数组类和普通类不同,它的数据不来自于class文件,而是有虚拟机在运行时生成
 */
 func (self *ClassLoader) loadNonArrayClass(name string) *Class {
+	fmt.Println("class name :" + name)
 	data, entry := self.readClass(name)
 	class := self.defineClass(data)
 	link(class)
@@ -53,15 +55,14 @@ func (self *ClassLoader) loadNonArrayClass(name string) *Class {
 }
 
 func (self *ClassLoader) readClass(name string) ([]byte, classpath.Entry) {
-	data, cp, err := self.cp.ReadClass(name)
+	data, entry, err := self.cp.ReadClass(name)
 	if err != nil {
 		panic("java.lang.ClassNotFoundException : " + name)
 	}
-	return data, cp
+	return data, entry
 }
 
 //类的加载分三步骤 首先把class文件数据读入内存;然后解析class文件,生成虚拟机可使用的类数据,并方入方法区;最后进行链接
-
 func (self *ClassLoader) defineClass(data []byte) *Class {
 	class := parseClass(data)
 	class.loader = self
@@ -82,18 +83,19 @@ func parseClass(data []byte) *Class {
 
 //所有类只有一个父类,除Object外,递归调用loadClass加载父类
 func resolveSuperClass(class *Class) {
-	if class.name != "java.lang.Object" {
-		class.superClass = class.loader.loadClass(class.name)
+	if strings.Index(class.name, "java/lang/Object") < 0 {
+		class.superClass = class.loader.LoadClass(class.superClassName)
 	}
+
 }
 
 //递归调用loadClass 加载interface
 func resolveInterfaces(class *Class) {
 	interfacesCount := len(class.interfaceNames)
 	if interfacesCount > 0 {
-		class.interfaceNames = class.interfaceNames
+		class.interfaces = make([]*Class, interfacesCount)
 		for i, interfaceName := range class.interfaceNames {
-			class.interfaces[i] = class.loader.loadClass(interfaceName)
+			class.interfaces[i] = class.loader.LoadClass(interfaceName)
 		}
 	}
 }
@@ -167,16 +169,16 @@ func initStaticFinalVar(class *Class, field *Field) {
 	if cpIndex > 0 {
 		switch field.Descriptor() {
 		case "Z", "B", "C", "S", "I":
-			val := cp.getConstant(cpIndex).(int32)
+			val := cp.GetConstants(cpIndex).(int32)
 			vars.SetInt(soltId, val)
 		case "J":
-			val := cp.getConstant(cpIndex).(int64)
+			val := cp.GetConstants(cpIndex).(int64)
 			vars.SetLong(soltId, val)
 		case "F":
-			val := cp.getConstant(cpIndex).(float32)
+			val := cp.GetConstants(cpIndex).(float32)
 			vars.SetFloat(soltId, val)
 		case "D":
-			val := cp.getConstant(cpIndex).(float64)
+			val := cp.GetConstants(cpIndex).(float64)
 			vars.SetDouble(cpIndex, val)
 		case "Ljava.lang.String;":
 			panic("todo")

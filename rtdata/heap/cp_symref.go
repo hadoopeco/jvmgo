@@ -29,3 +29,20 @@ type SymRef struct {
 	className string
 	class     *Class
 }
+
+func (self *SymRef) ResolvedClass() *Class {
+	if self.class == nil {
+		self.resolveClassRef()
+	}
+	return self.class
+}
+
+func (self *SymRef) resolveClassRef() {
+	d := self.cp.class
+	c := d.loader.LoadClass(self.className)
+	//如果类d想访问c, 需要满足两个条件之一: c是public, 或者c 和d 在同一个包内
+	if !c.isAccessibleTo(d) {
+		panic("java.lang.IllegalAccessError")
+	}
+	self.class = c
+}

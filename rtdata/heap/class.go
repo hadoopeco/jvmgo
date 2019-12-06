@@ -12,14 +12,22 @@ package heap
   方法区主要存放class文件获取的信息，此外类变量也放在方法区里。
   当JVM第一次使用某个类时，它会搜索类路径，找到相应的class文件，然后读取并解析class文件，把相关信息放在方法区。
 
+	ConstantPool ---1-------1---- Class          ClassMember
+										|1               |
+										|          ______|______
+										|		   |           |
+										|-----*- Field      Method
+										|					  |*
+										|_____________________|
 */
 
 import (
 	"jvmgo/classfile"
+	"strings"
 )
 
 type Class struct {
-	accessFlag        uint16
+	accessFlags       uint16
 	name              string //this class name
 	superClassName    string //super class name
 	interfaceNames    []string
@@ -37,7 +45,8 @@ type Class struct {
 //把classFile结构体转换成 class结构体
 func newClass(cf *classfile.ClassFile) *Class {
 	class := &Class{}
-	class.accessFlag = cf.AccessFlags()
+	class.accessFlags = cf.AccessFlags()
+	class.name = cf.ClassName()
 	class.superClassName = cf.SupperClassName()
 	class.interfaceNames = cf.InterFaceNames()
 	class.constantPool = newConstantPool(class, cf.ConstantPool())
@@ -48,5 +57,69 @@ func newClass(cf *classfile.ClassFile) *Class {
 
 //判断是否为public class
 func (self *Class) IsPublic() bool {
-	return 0 != self.accessFlag&ACC_PUBLIC
+	return 0 != self.accessFlags&ACC_PUBLIC
+}
+
+func (self *Class) IsFinal() bool {
+	return 0 != self.accessFlags&ACC_FINAL
+}
+func (self *Class) IsSuper() bool {
+	return 0 != self.accessFlags&ACC_SUPER
+}
+func (self *Class) IsInterface() bool {
+	return 0 != self.accessFlags&ACC_INTERFACE
+}
+func (self *Class) IsAbstract() bool {
+	return 0 != self.accessFlags&ACC_ABSTRACT
+}
+func (self *Class) IsSynthetic() bool {
+	return 0 != self.accessFlags&ACC_SYNTHETIC
+}
+func (self *Class) IsAnnotation() bool {
+	return 0 != self.accessFlags&ACC_ANNOTATION
+}
+func (self *Class) IsEnum() bool {
+	return 0 != self.accessFlags&ACC_ENUM
+}
+
+// getters
+func (self *Class) ConstantPool() *ConstantPool {
+	return self.constantPool
+}
+func (self *Class) StaticVars() Slots {
+	return self.staticVars
+}
+
+// jvms 5.4.4
+func (self *Class) isAccessibleTo(other *Class) bool {
+	return self.IsPublic() ||
+		self.getPackageName() == other.getPackageName()
+}
+
+func (self *Class) getPackageName() string {
+	if i := strings.LastIndex(self.name, "/"); i >= 0 {
+		return self.name[:i]
+	}
+	return ""
+}
+
+//获取Main方法
+func (self *Class) GetMainMethod() *Method {
+	return self.getStaticMethod("main", "([Ljava/lang/String;)V")
+}
+
+func (self *Class) getStaticMethod(name, descriptor string) *Method {
+	for _, method := range self.methods {
+		if method.IsStatic() &&
+			method.name == name &&
+			method.descriptor == descriptor {
+
+			return method
+		}
+	}
+	return nil
+}
+
+func (self *Class) NewObject() *Object {
+	return newObject(self)
 }

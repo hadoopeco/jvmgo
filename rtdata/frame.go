@@ -1,5 +1,7 @@
 package rtdata
 
+import "jvmgo/rtdata/heap"
+
 /**
  * Copyright (C) 2018
  * All rights reserved
@@ -10,18 +12,20 @@ package rtdata
  */
 
 type Frame struct {
-	lower  *Frame  //链表数据结构
-	localVars  LocalVars // 局部变量表指针
-	operandStack  *OperandStack //操作数栈指针
-	thread        *Thread       //线程指针
-	nextPC        int
+	lower        *Frame        //链表数据结构
+	localVars    LocalVars     // 局部变量表指针
+	operandStack *OperandStack //操作数栈指针
+	thread       *Thread       //线程指针
+	method       *heap.Method
+	nextPC       int
 }
 
-func newFrame(thread *Thread, maxLocals, maxStack uint) *Frame{
+func newFrame(thread *Thread, method *heap.Method) *Frame {
 	return &Frame{
-		thread: thread,
-		localVars:  newLocalVars(maxLocals),
-		operandStack: newOperandStack(maxStack),
+		thread:       thread,
+		method:       method,
+		localVars:    newLocalVars(method.MaxLocals()),
+		operandStack: newOperandStack(method.MaxStack()),
 	}
 }
 
@@ -45,5 +49,6 @@ func (self *Frame) Thread() *Thread {
 	return self.thread
 }
 
-
-
+func (self *Frame) Method() *heap.Method {
+	return self.method
+}

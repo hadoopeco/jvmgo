@@ -1,7 +1,8 @@
 package instructions
 
-
-import "fmt"
+import (
+	"fmt"
+)
 import "jvmgo/instructions/base"
 import . "jvmgo/instructions/comparisions"
 import . "jvmgo/instructions/constants"
@@ -12,6 +13,8 @@ import . "jvmgo/instructions/loads"
 import . "jvmgo/instructions/math"
 import . "jvmgo/instructions/stack"
 import . "jvmgo/instructions/stores"
+import . "jvmgo/instructions/references"
+
 /**
  * Copyright (C) 2018
  * All rights reserved
@@ -21,7 +24,7 @@ import . "jvmgo/instructions/stores"
  * Date: 2018/3/27 23:39
  */
 
- var (
+var (
 	nop         = &NOP{}
 	aconst_null = &ACONST_NULL{}
 	iconst_m1   = &ICONST_M1{}
@@ -159,8 +162,9 @@ import . "jvmgo/instructions/stores"
 	fcmpg   = &FCMPG{}
 	dcmpl   = &DCMPL{}
 	dcmpg   = &DCMPG{}
-
+	_return = &RETURN{}
 )
+
 func NewInstruction(opcode byte) base.Instruction {
 	switch opcode {
 	case 0x00:
@@ -199,12 +203,12 @@ func NewInstruction(opcode byte) base.Instruction {
 		return &BIPUSH{}
 	case 0x11:
 		return &SIPUSH{}
-		//case 0x12:
-		//	return &LDC{}
-		//case 0x13:
-		//	return &LDC_W{}
-		//case 0x14:
-		//	return &LDC2_W{}
+	case 0x12:
+		return &LDC{}
+	case 0x13:
+		return &LDC_W{}
+	case 0x14:
+		return &LDC2_W{}
 	case 0x15:
 		return &ILOAD{}
 	case 0x16:
@@ -517,48 +521,48 @@ func NewInstruction(opcode byte) base.Instruction {
 	//		return dreturn
 	//	case 0xb0:
 	//		return areturn
-	//	case 0xb1:
-	//		return _return
-	//case 0xb2:
-	//	return &GET_STATIC{}
-	//	case 0xb3:
-	//		return &PUT_STATIC{}
-	//	case 0xb4:
-	//		return &GET_FIELD{}
-	//	case 0xb5:
-	//		return &PUT_FIELD{}
-	//		case 0xb6:
-	//			return &INVOKE_VIRTUAL{}
-	//	case 0xb7:
-	//		return &INVOKE_SPECIAL{}
-	//	case 0xb8:
-	//		return &INVOKE_STATIC{}
-	//	case 0xb9:
-	//		return &INVOKE_INTERFACE{}
-	//	case 0xba:
-	//		return &INVOKE_DYNAMIC{}
-	//	case 0xbb:
-	//		return &NEW{}
-	//	case 0xbc:
-	//		return &NEW_ARRAY{}
-	//	case 0xbd:
-	//		return &ANEW_ARRAY{}
-	//	case 0xbe:
-	//		return arraylength
-	//	case 0xbf:
-	//		return athrow
-	//	case 0xc0:
-	//		return &CHECK_CAST{}
-	//	case 0xc1:
-	//		return &INSTANCE_OF{}
+	case 0xb1:
+		return _return
+	case 0xb2:
+		return &GET_STATIC{}
+	case 0xb3:
+		return &PUT_STATIC{}
+	case 0xb4:
+		return &GET_FIELD{}
+	case 0xb5:
+		return &PUT_FIELD{}
+	case 0xb6:
+		return &INVOKE_VIRTUAL{}
+	case 0xb7:
+		return &INVOKE_SPECIAL{}
+	//case 0xb8:
+	//	return &references.INVOKE_STATIC{}
+	//case 0xb9:
+	//	return &INVOKE_INTERFACE{}
+	//case 0xba:
+	//	return &INVOKE_DYNAMIC{}
+	case 0xbb:
+		return &New{}
+	//case 0xbc:
+	//	return &NEW_ARRAY{}
+	//case 0xbd:
+	//	return &ANEW_ARRAY{}
+	//case 0xbe:
+	//	return arraylength
+	//case 0xbf:
+	//	return athrow
+	case 0xc0:
+		return &CHECK_CAST{}
+	case 0xc1:
+		return &INSTANCE_OF{}
 	//	case 0xc2:
 	//		return monitorenter
 	//	case 0xc3:
 	//		return monitorexit
 	case 0xc4:
 		return &WIDE{}
-		// case 0xc5:
-		// 	return &MULTI_ANEW_ARRAY{}
+		//case 0xc5:
+		//	return &MULTI_ANEW_ARRAY{}
 	case 0xc6:
 		return &IFNULL{}
 	case 0xc7:
