@@ -169,16 +169,16 @@ func initStaticFinalVar(class *Class, field *Field) {
 	if cpIndex > 0 {
 		switch field.Descriptor() {
 		case "Z", "B", "C", "S", "I":
-			val := cp.GetConstants(cpIndex).(int32)
+			val := cp.GetConstant(cpIndex).(int32)
 			vars.SetInt(soltId, val)
 		case "J":
-			val := cp.GetConstants(cpIndex).(int64)
+			val := cp.GetConstant(cpIndex).(int64)
 			vars.SetLong(soltId, val)
 		case "F":
-			val := cp.GetConstants(cpIndex).(float32)
+			val := cp.GetConstant(cpIndex).(float32)
 			vars.SetFloat(soltId, val)
 		case "D":
-			val := cp.GetConstants(cpIndex).(float64)
+			val := cp.GetConstant(cpIndex).(float64)
 			vars.SetDouble(cpIndex, val)
 		case "Ljava.lang.String;":
 			panic("todo")

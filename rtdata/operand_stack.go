@@ -15,7 +15,7 @@ import (
  */
 
 type OperandStack struct {
-	size  uint    //记录栈顶位置
+	size  uint //记录栈顶位置
 	slots []Slot
 }
 
@@ -29,24 +29,24 @@ func newOperandStack(maxStack uint) *OperandStack {
 	return nil
 }
 
-func (self *OperandStack) PushInt(val int32)  {
+func (self *OperandStack) PushInt(val int32) {
 	self.slots[self.size].num = val
-	self.size ++
+	self.size++
 }
 
-func (self *OperandStack) PopInt() int32{
+func (self *OperandStack) PopInt() int32 {
 	self.size--
 	return self.slots[self.size].num
 }
 
-func (self *OperandStack) PushFloat(val float32)  {
+func (self *OperandStack) PushFloat(val float32) {
 	bits := math.Float32bits(val)
 	self.slots[self.size].num = int32(bits)
-	self.size ++
+	self.size++
 }
 
 func (self *OperandStack) PopFloat() float32 {
-	self.size --
+	self.size--
 	bits := uint32(self.slots[self.size].num)
 	return math.Float32frombits(bits)
 }
@@ -58,22 +58,21 @@ func (self *OperandStack) PushLong(val int64) {
 	self.size += 2
 }
 
-func (self *OperandStack) PopLong() int64  {
+func (self *OperandStack) PopLong() int64 {
 	self.size -= 2
 	low := uint32(self.slots[self.size].num)
 	high := uint32(self.slots[self.size+1].num)
 
-	return int64(high) << 32 | int64(low)
+	return int64(high)<<32 | int64(low)
 }
 
-
 //double 类型先变成long
-func (self *OperandStack) PushDouble(val float64)  {
+func (self *OperandStack) PushDouble(val float64) {
 	bits := math.Float64bits(val)
 	self.PushLong(int64(bits))
 }
 
-func (self *OperandStack) PopDouble() float64{
+func (self *OperandStack) PopDouble() float64 {
 	bits := uint64(self.PopLong())
 	return math.Float64frombits(bits)
 }
@@ -83,14 +82,14 @@ func (self *OperandStack) PushRef(ref *heap.Object) {
 	self.size++
 }
 
-func (self *OperandStack) PopRef() *heap.Object{
+func (self *OperandStack) PopRef() *heap.Object {
 	self.size--
 	ref := self.slots[self.size].ref
 	self.slots[self.size].ref = nil
 	return ref
 }
 
-func (self *OperandStack) PushSlot(slot Slot)  {
+func (self *OperandStack) PushSlot(slot Slot) {
 	self.slots[self.size] = slot
 	self.size++
 }
@@ -100,3 +99,6 @@ func (self *OperandStack) PopSlot() Slot {
 	return self.slots[self.size]
 }
 
+func (self *OperandStack) GetRefFromTop(n uint) *heap.Object {
+	return self.slots[self.size-1-n].ref
+}

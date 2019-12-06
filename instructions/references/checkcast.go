@@ -26,7 +26,7 @@ func (self *CHECK_CAST) Execute(frame *rtdata.Frame) {
 	}
 
 	cp := frame.Method().Class().ConstantPool()
-	classRef := cp.GetConstants(self.Index).(*heap.ClassRef)
+	classRef := cp.GetConstant(self.Index).(*heap.ClassRef)
 	class := classRef.ResolvedClass()
 	if !ref.IsInstanceOf(class) {
 		panic("java.lang.ClassCastException")

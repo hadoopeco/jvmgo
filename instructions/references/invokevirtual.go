@@ -19,9 +19,10 @@ import (
 // Invoke instance method; dispatch based on class
 type INVOKE_VIRTUAL struct{ base.Index16Instruction }
 
+// hack!
 func (self *INVOKE_VIRTUAL) Execute(frame *rtdata.Frame) {
 	cp := frame.Method().Class().ConstantPool()
-	methodRef := cp.GetConstants(self.Index).(*heap.MethodRef)
+	methodRef := cp.GetConstant(self.Index).(*heap.MethodRef)
 	if methodRef.Name() == "println" {
 		stack := frame.OperandStack()
 		switch methodRef.Descriptor() {
@@ -30,7 +31,7 @@ func (self *INVOKE_VIRTUAL) Execute(frame *rtdata.Frame) {
 		case "(C)V":
 			fmt.Printf("%c\n", stack.PopInt())
 		case "(I)V", "(B)V", "(S)V":
-			fmt.Printf("%v\n", stack.PopInt())
+			fmt.Printf("int : %v\n", stack.PopInt())
 		case "(F)V":
 			fmt.Printf("%v\n", stack.PopFloat())
 		case "(J)V":

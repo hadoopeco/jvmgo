@@ -27,7 +27,7 @@ func (self *INSTANCE_OF) Execute(frame *rtdata.Frame) {
 	}
 
 	cp := frame.Method().Class().ConstantPool()
-	classRef := cp.GetConstants(self.Index).(*heap.ClassRef)
+	classRef := cp.GetConstant(self.Index).(*heap.ClassRef)
 	class := classRef.ResolvedClass()
 	if ref.IsInstanceOf(class) {
 		stack.PushInt(1)

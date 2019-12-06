@@ -29,7 +29,7 @@ func (self *LDC_W) Execute(frame *rtdata.Frame) {
 func _idc(frame *rtdata.Frame, index uint) {
 	stack := frame.OperandStack()
 	cp := frame.Method().Class().ConstantPool()
-	c := cp.GetConstants(index)
+	c := cp.GetConstant(index)
 
 	switch c.(type) {
 	case int32:
@@ -46,7 +46,7 @@ func _idc(frame *rtdata.Frame, index uint) {
 func (self *LDC2_W) Execute(frame *rtdata.Frame) {
 	stack := frame.OperandStack()
 	cp := frame.Method().Class().ConstantPool()
-	c := cp.GetConstants(self.Index)
+	c := cp.GetConstant(self.Index)
 
 	switch c.(type) {
 	case int64:

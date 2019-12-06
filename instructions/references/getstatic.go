@@ -19,7 +19,7 @@ type GET_STATIC struct{ base.Index16Instruction }
 
 func (self *GET_STATIC) Execute(frame *rtdata.Frame) {
 	cp := frame.Method().Class().ConstantPool()
-	fieldRef := cp.GetConstants(self.Index).(*heap.FieldRef)
+	fieldRef := cp.GetConstant(self.Index).(*heap.FieldRef)
 	field := fieldRef.ResolvedField()
 	class := field.Class()
 

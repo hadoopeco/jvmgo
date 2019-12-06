@@ -2,8 +2,8 @@ package instructions
 
 import (
 	"fmt"
+	"jvmgo/instructions/base"
 )
-import "jvmgo/instructions/base"
 import . "jvmgo/instructions/comparisions"
 import . "jvmgo/instructions/constants"
 import . "jvmgo/instructions/control"
@@ -521,8 +521,8 @@ func NewInstruction(opcode byte) base.Instruction {
 	//		return dreturn
 	//	case 0xb0:
 	//		return areturn
-	case 0xb1:
-		return _return
+	//case 0xb1:
+	//	return _return
 	case 0xb2:
 		return &GET_STATIC{}
 	case 0xb3:

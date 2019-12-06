@@ -1,5 +1,7 @@
 package rtdata
 
+import "fmt"
+
 /**
  * Copyright (C) 2018
  * All rights reserved
@@ -11,23 +13,23 @@ package rtdata
 
 type Stack struct {
 	maxSize uint
-	size   uint
-	_top   *Frame // stack is implemented as linked list
+	size    uint
+	_top    *Frame // stack is implemented as linked list
 }
 
-
-func newStack(maxSize uint) *Stack{
+func newStack(maxSize uint) *Stack {
 	return &Stack{
 		maxSize: maxSize,
 	}
 }
 
-func (self *Stack) push(frame *Frame){
-	if self.size > self.maxSize{
+func (self *Stack) push(frame *Frame) {
+	fmt.Printf("push stack size =%d \n", self.size)
+	if self.size > self.maxSize {
 		panic("StackOverflowError")
 	}
 
-	if self._top != nil{
+	if self._top != nil {
 		frame.lower = self._top
 	}
 
@@ -35,11 +37,11 @@ func (self *Stack) push(frame *Frame){
 	self.size++
 }
 
-func (self *Stack) pop() *Frame{
+func (self *Stack) pop() *Frame {
+	fmt.Printf("pop stack size =%d \n", self.size)
 	if self._top == nil {
 		panic("jvm stack is empty")
 	}
-
 	top := self._top
 	self._top = top.lower
 	top.lower = nil
@@ -48,12 +50,10 @@ func (self *Stack) pop() *Frame{
 	return top
 }
 
-func(self *Stack) top() *Frame{
+func (self *Stack) top() *Frame {
 	if self._top == nil {
 		panic("jvm stack is empty")
 	}
 
 	return self._top
 }
-
-

@@ -21,7 +21,7 @@ func (self *PUT_FIELD) Execute(frame *rtdata.Frame) {
 	currentMethod := frame.Method()
 	currentClass := currentMethod.Class()
 	cp := currentClass.ConstantPool()
-	fieldRef := cp.GetConstants(self.Index).(*heap.FieldRef)
+	fieldRef := cp.GetConstant(self.Index).(*heap.FieldRef)
 	field := fieldRef.ResolvedField()
 
 	if field.IsStatic() {

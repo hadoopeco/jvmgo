@@ -28,7 +28,7 @@ type ConstantPool struct {
 }
 
 // 根据索引获取常量值
-func (self ConstantPool) GetConstants(index uint) Constant {
+func (self ConstantPool) GetConstant(index uint) Constant {
 	if c := self.constants[index]; c != nil {
 		return c
 	}

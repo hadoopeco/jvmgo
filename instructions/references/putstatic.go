@@ -22,7 +22,7 @@ func (self *PUT_STATIC) Execute(frame *rtdata.Frame) {
 	currentMethod := frame.Method()
 	currentClass := currentMethod.Class()
 	cp := currentClass.ConstantPool()
-	fieldRef := cp.GetConstants(self.Index).(*heap.FieldRef)
+	fieldRef := cp.GetConstant(self.Index).(*heap.FieldRef)
 	field := fieldRef.ResolvedField()
 	fmt.Printf("PUT_STATIC = %v \n", field)
 	class := field.Class()

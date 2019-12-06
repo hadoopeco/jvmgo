@@ -20,7 +20,7 @@ type New struct{ base.Index16Instruction }
 
 func (self *New) Execute(frame *rtdata.Frame) {
 	cp := frame.Method().Class().ConstantPool()
-	classInfo := cp.GetConstants(self.Index).(*heap.ClassRef)
+	classInfo := cp.GetConstant(self.Index).(*heap.ClassRef)
 	class := classInfo.ResolvedClass()
 
 	if class.IsInterface() || class.IsAbstract() {
