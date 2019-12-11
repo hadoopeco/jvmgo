@@ -26,6 +26,11 @@ func (self *PUT_STATIC) Execute(frame *rtdata.Frame) {
 	field := fieldRef.ResolvedField()
 	fmt.Printf("PUT_STATIC = %v \n", field)
 	class := field.Class()
+	if !class.InitStarted() {
+		frame.RevertNextPC()
+		base.InitClass(frame.Thread(), class)
+		return
+	}
 
 	//解析出的字段如不是静态变量则报错
 	if !field.IsStatic() {

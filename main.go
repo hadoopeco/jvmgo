@@ -24,31 +24,31 @@ func main() {
 func startJVM(cmd *Cmd) {
 	cp := classpath.Parse(cmd.XjreOption, cmd.cpOption)
 
-	classLoader := heap.NewClassLoader(cp)
+	classLoader := heap.NewClassLoader(cp, false)
 
 	className := strings.Replace(cmd.class, ".", "/", -1)
 	class := classLoader.LoadClass(className)
 	mainMethod := class.GetMainMethod()
 	if mainMethod != nil {
-		interpret(mainMethod)
+		interpret(mainMethod, true)
 	} else {
 		fmt.Printf("Main method not found in class %s\n", cmd.class)
 	}
 }
 
-func loadClass(className string, cp *classpath.Classpath) *classfile.ClassFile {
-	classData, _, err := cp.ReadClass(className)
-	if err != nil {
-		panic(err)
-	}
-
-	cf, err := classfile.Parse(classData)
-	if err != nil {
-		panic(err)
-	}
-
-	return cf
-}
+//func loadClass(className string, cp *classpath.Classpath) *classfile.ClassFile {
+//	classData, _, err := cp.ReadClass(className)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	cf, err := classfile.Parse(classData)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	return cf
+//}
 
 func getMainMethod(cf *classfile.ClassFile) *classfile.MemberInfo {
 	for _, m := range cf.Methods() {

@@ -17,42 +17,67 @@ import (
  * Date: 2018/3/28 2:31
  */
 
-func interpret(method *heap.Method) {
+func interpret(method *heap.Method, logInst bool) {
 
 	thread := rtdata.NewThread()
 	frame := thread.NewFrame(method)
-	fmt.Printf("interpret :%v \n", method.Code())
 	thread.PushFrame(frame)
-
-	defer catchErr(frame)
-	loop(thread, method.Code())
+	fmt.Printf("befor loop thread.stack = %v \n", thread.Stack())
+	defer catchErr(thread)
+	loop(thread, logInst)
 }
 
-func catchErr(frame *rtdata.Frame) {
+func catchErr(thread *rtdata.Thread) {
 	if r := recover(); r != nil {
-		//fmt.Printf("LocalVars: %v \n", frame.LocalVars())
-		//fmt.Printf("OperandsStack:%v\n", frame.OperandStack())
-		//panic(r)
+		logFrames(thread)
+		panic(r)
 	}
 }
 
 //循环执行 "计算pc, 解码指令, 执行指令"
-func loop(thread *rtdata.Thread, bytecode []byte) {
-	frame := thread.PopFrame()
+func loop(thread *rtdata.Thread, logInst bool) {
+
 	reader := &base.BytecodeReader{}
 	for {
+		//frame := thread.PopFrame()
+		frame := thread.CurrentFrame()
 		pc := frame.NextPC()
 		thread.SetPC(pc)
 
 		// decode
-		reader.Reset(bytecode, pc)
+		reader.Reset(frame.Method().Code(), pc)
+		fmt.Printf("thread=%v code= %v current pc = %v \n", thread.Stack(), frame.Method().Code(), pc)
 		opcode := reader.ReadUint8()
 		inst := instructions.NewInstruction(opcode)
 		inst.FetchOperands(reader)
 		frame.SetNextPC(reader.PC())
 
+		if logInst {
+			logInstruction(frame, inst)
+		}
+
 		// execute
-		fmt.Printf("pc:%2d opcode:0x%2d inst:%T %v\n", pc, opcode, inst, inst)
 		inst.Execute(frame)
+		if thread.IsStackEmpty() {
+			break
+		}
+	}
+}
+
+func logInstruction(frame *rtdata.Frame, inst base.Instruction) {
+	method := frame.Method()
+	className := method.Class().Name()
+	methodName := method.Name()
+	pc := frame.Thread().PC()
+	fmt.Printf("logInstruction =%v.%v() #%2d %T %v\n", className, methodName, pc, inst, inst)
+}
+
+func logFrames(thread *rtdata.Thread) {
+	for !thread.IsStackEmpty() {
+		frame := thread.PopFrame()
+		method := frame.Method()
+		className := method.Class().Name()
+		fmt.Printf(">> pc:%4d %v.%v%v \n",
+			frame.NextPC(), className, method.Name(), method.Descriptor())
 	}
 }

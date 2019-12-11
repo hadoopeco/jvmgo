@@ -1,4 +1,5 @@
 package classfile
+
 /**
  * Copyright (C) 2018
  * All rights reserved
@@ -7,7 +8,10 @@ package classfile
  * @mail: marks@126.com
  * Date: 2018/3/20 17:20
  */
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"fmt"
+)
 
 type ClassReader struct {
 	data []byte
@@ -33,6 +37,7 @@ func (self *ClassReader) readUint32() uint32 {
 	self.data = self.data[4:]
 	return val
 }
+
 //64比特无符号整数
 func (self *ClassReader) readUint64() uint64 {
 	val := binary.BigEndian.Uint64(self.data)
@@ -47,12 +52,12 @@ func (self *ClassReader) readUint16s() []uint16 {
 	for i := range s {
 		s[i] = self.readUint16()
 	}
-
+	fmt.Printf("ClassReader readUint16s n = %v s= %v \n", n, s)
 	return s
 }
 
 // reader any length of identified bytes
-func (self *ClassReader) readBytes(n uint32) []byte{
+func (self *ClassReader) readBytes(n uint32) []byte {
 	bytes := self.data[:n]
 	self.data = self.data[n:]
 

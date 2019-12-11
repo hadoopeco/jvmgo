@@ -25,6 +25,7 @@ func readConstantPool(reader *ClassReader) ConstantPool {
 		// table at index n, then the next usable item in the pool is located at index n+2.
 		// The constant_pool index n+1 must be valid but is considered unusable.
 		switch cp[i].(type) {
+		// long 和 double各占两个位置
 		case *ConstantLongInfo, *ConstantDoubleInfo:
 			i++
 		}
@@ -47,6 +48,7 @@ func (self ConstantPool) getNameAndType(index uint16) (string, string) {
 	return name, _type
 }
 
+//常量池中查找类名
 func (self ConstantPool) getClassName(index uint16) string {
 	classInfo := self.getConstantInfo(index).(*ConstantClassInfo)
 	return self.getUtf8(classInfo.nameIndex)

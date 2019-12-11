@@ -40,6 +40,7 @@ type Class struct {
 	instanceSlotCount uint          // 实例变量占据的空间大小
 	staticSlotCount   uint          // 类变量占据的空间大小
 	staticVars        Slots         // 静态变量
+	initStarted       bool          //标识<clinit>方法是否已经开始运行
 }
 
 //把classFile结构体转换成 class结构体
@@ -82,6 +83,10 @@ func (self *Class) IsEnum() bool {
 	return 0 != self.accessFlags&ACC_ENUM
 }
 
+func (self *Class) SuperClass() *Class {
+	return self.superClass
+}
+
 // getters
 func (self *Class) ConstantPool() *ConstantPool {
 	return self.constantPool
@@ -90,13 +95,24 @@ func (self *Class) StaticVars() Slots {
 	return self.staticVars
 }
 
+func (self *Class) Name() string {
+	return self.name
+}
+func (self *Class) InitStarted() bool {
+	return self.initStarted
+}
+
+func (self *Class) StartInit() {
+	self.initStarted = true
+}
+
 // jvms 5.4.4
 func (self *Class) isAccessibleTo(other *Class) bool {
 	return self.IsPublic() ||
-		self.getPackageName() == other.getPackageName()
+		self.GetPackageName() == other.GetPackageName()
 }
 
-func (self *Class) getPackageName() string {
+func (self *Class) GetPackageName() string {
 	if i := strings.LastIndex(self.name, "/"); i >= 0 {
 		return self.name[:i]
 	}
@@ -106,6 +122,11 @@ func (self *Class) getPackageName() string {
 //获取Main方法
 func (self *Class) GetMainMethod() *Method {
 	return self.getStaticMethod("main", "([Ljava/lang/String;)V")
+}
+
+//获取构造方法
+func (self *Class) GetClinitMethod() *Method {
+	return self.getStaticMethod("<clinit>", "()V")
 }
 
 func (self *Class) getStaticMethod(name, descriptor string) *Method {
@@ -122,4 +143,8 @@ func (self *Class) getStaticMethod(name, descriptor string) *Method {
 
 func (self *Class) NewObject() *Object {
 	return newObject(self)
+}
+
+func (self *Class) Loader() *ClassLoader {
+	return self.loader
 }

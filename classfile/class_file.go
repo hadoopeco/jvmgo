@@ -1,4 +1,5 @@
 package classfile
+
 /**
  * Copyright (C) 2018
  * All rights reserved
@@ -8,7 +9,6 @@ package classfile
  * Date: 2018/3/20 19:08
  */
 import "fmt"
-
 
 /*
 ClassFile {
@@ -35,19 +35,19 @@ type ClassFile struct {
 	minorVersion uint16
 	majorVersion uint16
 	constantPool ConstantPool
-	accessFlags uint16
-	thisClass uint16
-	superClass uint16
-	interfaces []uint16
-	fields [] *MemberInfo
-	methods [] *MemberInfo
-    attributes [] AttributeInfo
+	accessFlags  uint16
+	thisClass    uint16
+	superClass   uint16
+	interfaces   []uint16
+	fields       []*MemberInfo
+	methods      []*MemberInfo
+	attributes   []AttributeInfo
 }
 
-func Parse(classData []byte) (cf *ClassFile, err error)  {
+func Parse(classData []byte) (cf *ClassFile, err error) {
 	defer func() {
-		if r := recover(); r != nil{
-			var ok  bool
+		if r := recover(); r != nil {
+			var ok bool
 			_, ok = r.(error)
 
 			if !ok {
@@ -55,17 +55,17 @@ func Parse(classData []byte) (cf *ClassFile, err error)  {
 			}
 		}
 	}()
-
-	cr := &ClassReader{ classData }
+	//fmt.Printf("classFile data = %v\n", classData)
+	cr := &ClassReader{classData}
 	cf = &ClassFile{}
 	cf.read(cr)
 	return
 }
 
-func (self *ClassFile) read(reader *ClassReader)   {
-	self.readCheckMagic(reader)
-	self.readAndCheckVersion(reader)
-	self.constantPool = readConstantPool(reader)
+func (self *ClassFile) read(reader *ClassReader) {
+	self.readCheckMagic(reader)                  //读取magic字符 202 254 186 190 0 0 0
+	self.readAndCheckVersion(reader)             //读取编译器version信息
+	self.constantPool = readConstantPool(reader) //读取常量池内容
 	self.accessFlags = reader.readUint16()
 	self.thisClass = reader.readUint16()
 	self.superClass = reader.readUint16()
@@ -76,13 +76,12 @@ func (self *ClassFile) read(reader *ClassReader)   {
 }
 
 // reader the file header to make sure the file is java Class file
-func (self *ClassFile) readCheckMagic(reader *ClassReader)  {
+func (self *ClassFile) readCheckMagic(reader *ClassReader) {
 	magic := reader.readUint32()
 	if magic != 0xCAFEBABE {
 		panic("Class file format error ")
 	}
 }
-
 
 func (self *ClassFile) MajorVersion() uint16 {
 	return self.majorVersion
@@ -92,34 +91,34 @@ func (self *ClassFile) MinorVersion() uint16 {
 	return self.minorVersion
 }
 
-func (self *ClassFile) ClassName() string{
+func (self *ClassFile) ClassName() string {
 	return self.constantPool.getClassName(self.thisClass)
 }
 
-func (self *ClassFile) SupperClassName() string  {
+func (self *ClassFile) SupperClassName() string {
 	if self.superClass > 0 {
 		return self.constantPool.getClassName(self.superClass)
 	}
-	return "Object no superClass"  // java.lang.Object 没有超类
+	return "Object no superClass" // java.lang.Object 没有超类
 }
 
-func (self *ClassFile) InterFaceNames() []string{
+func (self *ClassFile) InterFaceNames() []string {
 	interfaceNames := make([]string, len(self.interfaces))
-	for i, cpIndex := range self.interfaces{
+	for i, cpIndex := range self.interfaces {
 		interfaceNames[i] = self.constantPool.getClassName(cpIndex)
 	}
 	return interfaceNames
 }
 
-func (self *ClassFile) readAndCheckVersion(reader *ClassReader)  {
+func (self *ClassFile) readAndCheckVersion(reader *ClassReader) {
 	self.minorVersion = reader.readUint16()
 	self.majorVersion = reader.readUint16()
 
 	switch self.majorVersion {
 	case 45:
 		return
-	case 46, 47,48,50,51,52:
-		if self.minorVersion == 0{
+	case 46, 47, 48, 50, 51, 52:
+		if self.minorVersion == 0 {
 			return
 		}
 	}
@@ -127,7 +126,7 @@ func (self *ClassFile) readAndCheckVersion(reader *ClassReader)  {
 	panic("java.lang.UnSupportClassVersion!")
 }
 
-func (self *ClassFile) ConstantPool() ConstantPool{
+func (self *ClassFile) ConstantPool() ConstantPool {
 	return self.constantPool
 }
 
@@ -135,10 +134,10 @@ func (self *ClassFile) AccessFlags() uint16 {
 	return self.accessFlags
 }
 
-func (self *ClassFile) Methods() []*MemberInfo{
+func (self *ClassFile) Methods() []*MemberInfo {
 	return self.methods
 }
 
-func (self *ClassFile) Fields() []*MemberInfo{
+func (self *ClassFile) Fields() []*MemberInfo {
 	return self.fields
 }

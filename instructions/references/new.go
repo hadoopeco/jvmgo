@@ -22,6 +22,11 @@ func (self *New) Execute(frame *rtdata.Frame) {
 	cp := frame.Method().Class().ConstantPool()
 	classInfo := cp.GetConstant(self.Index).(*heap.ClassRef)
 	class := classInfo.ResolvedClass()
+	if !class.InitStarted() {
+		frame.RevertNextPC()
+		base.InitClass(frame.Thread(), class)
+		return
+	}
 
 	if class.IsInterface() || class.IsAbstract() {
 		panic("java.lang.InstantiationError")

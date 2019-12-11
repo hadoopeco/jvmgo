@@ -1,4 +1,5 @@
 package classpath
+
 /**
  * Copyright (C) 2018
  * All rights reserved
@@ -37,7 +38,7 @@ func (self *ZipEntry) readClass(className string) ([]byte, Entry, error) {
 	}
 
 	defer r.Close()
-	//find class file
+	//find class file from jar or zip
 	for _, f := range r.File {
 		if f.Name == className {
 			rc, err := f.Open()
